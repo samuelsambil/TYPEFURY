@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Typing Practice</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="./main.css" />
+    <link rel="stylesheet" href="./index.css" />
+    <noscript><link rel="stylesheet" href="./assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <div class="top">
+            <div class="btop">
+                <span class="logo"><img src="./images/logo.svg" alt="" /></span>
+                <h2 class="name">TypeFury</h2>
+            </div>
+            <div class="xtop" id="text-container">
+                <p class="word" id="text"> </p>
+            </div>
+        </div>
+        <div id="timer">
+            <p class="time_w">Time:</p>
+            <div id="clock">00:20</div>
+        </div>
+        <div id="main">
+            <section id="cta" class="main special">
+                <div class="sect">
+                    <header class="major">
+                        <h2 class="head2">Practice Your Typing With Type Fury</h2>
+                        <p class="sword">Click the start button to begin the game. Type the words as fast as you can!</p>
+                        <p id="quote"></p>
+                        <p id="message"></p>
+                        <p id="words" style="font-size: 24px;"></p>
+                    </header>
+                    <footer class="major">
+                        <div class="type">
+                            <input type="text" aria-label="current word" id="typed-value" oninput="checkWord()" style="display: none;" />
+                        </div>
+                        <ul class="actions special">
+                            <li id="start" type="button"><a class="button primary" onclick="startGame()">Start Game</a></li>
+                            <li id="restart" type="button" style="display: none;"><a class="button primary" onclick="restartGame()">Restart Game</a></li>
+                        </ul>
+                    </footer>
+                </div>
+            </section>
+        </div>
+        <footer id="footer">
+            <section>
+                <h2>Join Our Community!</h2>
+                <p>Improve your typing speed with TypeFury! Join the community today!<br/>
+                Share your typing speed and accuracy with your friends and challenge them to a duel!<br/>
+                Track your progress over time and see how you're improving!</p>
+            </section>
+            <section>
+                <h2>Contact</h2>
+                <dl class="alt">
+                    <dt>Address</dt>
+                    <dd> Atwima Kwanwoma &bull; Bebu, Kumasi, Box 15243 &bull; Ghana</dd>
+                    <dt>Phone</dt>
+                    <dd>(+233) 557738831</dd>
+                    <dt>Email</dt>
+                    <dd><a href="https://mail.google.com/mail/u/0/#inbox">sambilsamuel2@gmail.com</a></dd>
+                </dl>
+            </section>            <p class "copyright">&copy; Design: <a href="https://www.transform-tomorrow.org">Transform Tomorrow Foundation</a>.</p>
+        </footer>
+    </div>
+    
+    <script src="./index.js"></script>
+    <script>
+        let timeLeft = 30; // Initial time
+        let isGameStarted = false;
+        let isGameDone = false;
+        let currentWord = "";
+        let correctWords = 0;
+        let totalWords = 5; // Set the total number of words to type
+
+        const levelConfig = [
+            { time: 30, words: ["keyboard", "challenge", "practice", "speed", "accuracy", "typing"] },
+            { time: 20, words: ["level", "difficulty", "progress", "challenge", "improve", "faster"] },
+            { time: 15, words: ["excellent", "competition", "victory", "improvement", "dedication", "achievement"] }
+        ];
+        let currentLevel = 1;
+
+        function startGame() {
+            if (!isGameStarted) {
+                isGameStarted = true;
+                document.getElementById("quote").textContent = "Get ready to type!";
+                document.getElementById("start").style.display = "none";
+                document.getElementById("typed-value").style.display = "inline";
+                document.getElementById("typed-value").focus();
+                document.getElementById("words").textContent = levelConfig[currentLevel - 1].words.join(', ');
+                startTimer();
+                getNextWord();
+            }
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById("clock");
+            const timer = setInterval(function () {
+                if (timeLeft <= 0 || isGameDone) {
+                    clearInterval(timer);
+                    handleGameEnd();
+                } else {
+                    timeLeft--;
+                    timerElement.textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function getNextWord() {
+            if (correctWords < totalWords) {
+                currentWord = getRandomWord();
+                document.getElementById("text").textContent = currentWord;
+            } else {
+                handleGameEnd();
+            }
+        }
+
+        function getRandomWord() {
+            const words = levelConfig[currentLevel - 1].words;
+            return words[Math.floor(Math.random() * words.length)];
+        }
+
+        function handleGameEnd() {
+            if (correctWords === totalWords) {
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    restartGame();
+                    document.getElementById("quote").textContent = "Moving to the next level";
+                    document.getElementById("words").textContent = levelConfig[currentLevel - 1].words.join(', ');
+                } else {
+                    document.getElementById("quote").textContent = "Game Over";
+                    document.getElementById("message").textContent = `You Did It: ${correctWords}`;
+                    isGameDone = true;
+                    document.getElementById("restart").style.display = "inline";
+                    document.getElementById("typed-value").blur();
+                }
+            } else {
+                document.getElementById("quote").textContent = "Game Over";
+                document.getElementById("message").textContent = `You Did It: ${correctWords}`;
+                document.getElementById("restart").style.display = "inline";
+                document.getElementById("typed-value").blur();
+            }
+        }
+
+        function checkWord() {
+            if (!isGameStarted || isGameDone) return;
+            const typedValue = document.getElementById("typed-value").value;
+            if (typedValue === currentWord) {
+                correctWords++;
+                getNextWord();
+                document.getElementById("typed-value").value = "";
+            }
+        }
+
+        function restartGame() {
+            timeLeft = levelConfig[currentLevel - 1].time;
+            isGameStarted = false;
+            isGameDone = false;
+            currentWord = "";
+            correctWords = 0;
+            document.getElementById("quote").textContent = "";
+            document.getElementById("message").textContent = `Level ${currentLevel} - You Did It: ${correctWords}`;
+            document.getElementById("clock").textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
+            document.getElementById("typed-value").value = "";
+            document.getElementById("typed-value").style.display = "inline";
+            document.getElementById("typed-value").focus();
+            document.getElementById("restart").style.display = "none";
+        }
+    </script>
+</body>
+</html>
